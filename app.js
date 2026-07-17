@@ -14,12 +14,22 @@ const app = express();
 
 
 
+const allowedOrigins = [
+    /^http:\/\/localhost:\d+$/,
+    /^https:\/\/buyer-seller-frontend[\w-]*\.vercel\.app$/,
+];
+
 app.use(cors({
-    origin: [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "https://buyer-seller-frontend.vercel.app"
-    ],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (e.g. mobile apps, curl, Postman)
+        if (!origin) return callback(null, true);
+        const isAllowed = allowedOrigins.some(pattern => pattern.test(origin));
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            callback(new Error(`CORS policy: Origin '${origin}' not allowed`));
+        }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
