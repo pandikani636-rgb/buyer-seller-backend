@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.route('/products').get(getAllProducts);
 router.route('/products/all').get(getProducts);
+router.route('/products/slider').get(getProducts);
 
 router.route('/admin/products').get(isAuthenticatedUser, authorizeRoles("admin", "seller"), getAdminProducts);
 
