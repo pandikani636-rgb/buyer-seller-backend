@@ -11,12 +11,17 @@ const cors = require('cors');
 
 const app = express();
 
+
+
 app.use(cors({
     origin: [
         "http://localhost:3000",
+        "http://localhost:3001",
         "https://buyer-seller-frontend.vercel.app"
     ],
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json({ limit: '50mb' }));
@@ -47,5 +52,7 @@ app.use('/api/v1/seller', seller);
 app.use('/admin/product/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(errorMiddleware);
+
+
 
 module.exports = app;

@@ -82,6 +82,11 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
     console.log("Files:", req.files?.length || 0);
     console.log("Body:", req.body);
 
+    // Verify user is authenticated
+    if (!req.user) {
+        return next(new ErrorHandler("User authentication failed", 401));
+    }
+
     const requiredFields = ["name", "description", "price", "stock", "category"];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
     if (missingFields.length > 0) {
@@ -91,7 +96,8 @@ exports.createProduct = asyncErrorHandler(async (req, res, next) => {
     let images = [];
 
     if (req.files && req.files.length > 0) {
-        images = req.files.map((file) => path.resolve(file.path));
+        // Use file path directly from multer without resolving
+        images = req.files.map((file) => file.path);
     } else if (typeof req.body.images === "string") {
         images.push(req.body.images);
     } else if (Array.isArray(req.body.images) && req.body.images.length > 0) {
@@ -166,6 +172,11 @@ exports.updateProduct = asyncErrorHandler(async (req, res, next) => {
     let product = await Product.findById(req.params.id);
     if (!product) return next(new ErrorHandler("Product Not Found", 404));
 
+    // Verify user is authenticated
+    if (!req.user) {
+        return next(new ErrorHandler("User authentication failed", 401));
+    }
+
     // Verify ownership
     if (req.user.role === 'seller' && product.seller && product.seller.toString() !== req.user.id) {
         return next(new ErrorHandler("Not authorized to update this product", 403));
@@ -230,6 +241,11 @@ exports.deleteProduct = asyncErrorHandler(async (req, res, next) => {
         return next(new ErrorHandler("Product Not Found", 404));
     }
 
+    // Verify user is authenticated
+    if (!req.user) {
+        return next(new ErrorHandler("User authentication failed", 401));
+    }
+
     // Verify ownership
     if (req.user.role === 'seller' && product.seller && product.seller.toString() !== req.user.id) {
         return next(new ErrorHandler("Not authorized to delete this product", 403));
@@ -237,7 +253,11 @@ exports.deleteProduct = asyncErrorHandler(async (req, res, next) => {
 
     // Deleting Images From Cloudinary
     for (let i = 0; i < product.images.length; i++) {
-        await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+        try {
+            await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+        } catch (err) {
+            console.warn(`Failed to delete image from Cloudinary: ${product.images[i].public_id}`, err);
+        }
     }
 
     await product.remove();
