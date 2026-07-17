@@ -118,8 +118,11 @@ userSchema.pre("save", async function (next) {
 
 // ===== JWT TOKEN =====
 userSchema.methods.getJWTToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET || "FLIPKART", {
-        expiresIn: "3d",
+    if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET environment variable is not set. Please configure it in config.env");
+    }
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE || "7d",
     });
 };
 

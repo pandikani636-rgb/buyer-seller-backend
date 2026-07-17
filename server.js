@@ -1,9 +1,14 @@
 const path = require("path");
 const express = require("express");
+
+// Load environment variables FIRST - before any other requires
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config({ path: 'config/config.env' });
+}
+
 const cloudinary = require("cloudinary");
 const app = require("./app");
 const connectDatabase = require("./config/database");
-require("dotenv").config();
 
 // Uncaught Exception
 process.on("uncaughtException", (err) => {
