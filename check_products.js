@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const Product = require('./models/productModel');
 
-dotenv.config({ path: 'config/config.env' });
+dotenv.config({ path: path.join(__dirname, 'config/config.env') });
 
 const checkProducts = async () => {
     try {

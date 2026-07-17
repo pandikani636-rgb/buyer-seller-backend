@@ -118,12 +118,15 @@ userSchema.pre("save", async function (next) {
 
 // ===== JWT TOKEN =====
 userSchema.methods.getJWTToken = function () {
-    if (!process.env.JWT_SECRET) {
-        throw new Error("JWT_SECRET environment variable is not set. Please configure it in config.env");
+    const secret = process.env.JWT_SECRET;
+    const expiresIn = process.env.JWT_EXPIRE || "7d";
+    
+    if (!secret) {
+        console.error("ERROR: JWT_SECRET is not set in environment variables!");
+        throw new Error("JWT_SECRET not configured");
     }
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE || "7d",
-    });
+    
+    return jwt.sign({ id: this._id }, secret, { expiresIn });
 };
 
 // ===== COMPARE PASSWORD =====

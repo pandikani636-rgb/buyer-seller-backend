@@ -119,11 +119,24 @@ sellerSchema.pre('save', function (next) {
     next();
 });
 
+// ===== HASH PASSWORD BEFORE SAVE =====
+sellerSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+});
+
 // ===== JWT TOKEN =====
 sellerSchema.methods.getJWTToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET || "FLIPKART", {
-        expiresIn: "3d", // Consistent with userModel
-    });
+    const secret = process.env.JWT_SECRET;
+    const expiresIn = process.env.JWT_EXPIRE || "7d";
+    
+    if (!secret) {
+        console.error("ERROR: JWT_SECRET is not set in environment variables!");
+        throw new Error("JWT_SECRET not configured");
+    }
+    
+    return jwt.sign({ id: this._id }, secret, { expiresIn });
 };
 
 // ===== COMPARE PASSWORD =====

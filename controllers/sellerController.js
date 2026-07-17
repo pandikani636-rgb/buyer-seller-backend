@@ -28,15 +28,12 @@ const registerSeller = async (req, res) => {
             });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
         // Create seller
         const seller = await Seller.create({
             name,
             email,
             phone,
-            password: hashedPassword,
+            password,
             companyName,
             gstNumber,
             businessType,
@@ -423,13 +420,6 @@ const getSellerStats = async (req, res) => {
             error: error.message
         });
     }
-};
-
-// Generate JWT Token
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d'
-    });
 };
 
 // @desc    Get current seller details

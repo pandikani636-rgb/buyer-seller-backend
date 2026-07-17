@@ -3,7 +3,7 @@ const express = require("express");
 
 // Load environment variables FIRST - before any other requires
 if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config({ path: 'config/config.env' });
+    require('dotenv').config({ path: path.join(__dirname, 'config/config.env') });
 }
 
 const cloudinary = require("cloudinary");
