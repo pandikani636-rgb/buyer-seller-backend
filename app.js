@@ -23,11 +23,25 @@ app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (e.g. mobile apps, curl, Postman)
         if (!origin) return callback(null, true);
-        const isAllowed = allowedOrigins.some(pattern => pattern.test(origin));
+        
+        // Allow FRONTEND_URL if set in env
+        if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
+            return callback(null, true);
+        }
+
+        const isAllowed = allowedOrigins.some(pattern => {
+            if (pattern instanceof RegExp) {
+                return pattern.test(origin);
+            }
+            return pattern === origin;
+        });
+
         if (isAllowed) {
             callback(null, true);
         } else {
-            callback(new Error(`CORS policy: Origin '${origin}' not allowed`));
+            // Do not throw an Error object here as it crashes Express routing and results in a 500 error without CORS headers.
+            // Returning false will simply deny the CORS request gracefully.
+            callback(null, false);
         }
     },
     credentials: true,
