@@ -54,6 +54,18 @@ app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+const connectDatabase = require('./config/database');
+app.use(async (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        try {
+            await connectDatabase();
+        } catch (error) {
+            return next(error);
+        }
+    }
+    next();
+});
+
 const user = require('./routes/userRoute');
 const product = require('./routes/productRoute');
 const order = require('./routes/orderRoute');
