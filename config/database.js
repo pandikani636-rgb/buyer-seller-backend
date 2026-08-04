@@ -15,7 +15,7 @@ const connectDatabase = async () => {
     }
 
     if (!cached.promise) {
-        const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/ecommerceDb";
+        const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://pandikani636_db_user:877887%24Pk@cluster0.chwzj4f.mongodb.net/ecommerceDb?retryWrites=true&w=majority&appName=Cluster0";
         console.log("=> connecting to database...");
         
         const opts = {
@@ -36,6 +36,11 @@ const connectDatabase = async () => {
     } catch (e) {
         cached.promise = null;
         console.error("MongoDB connection error:", e.message);
+        
+        if (e.message && e.message.includes("bad auth")) {
+            throw new Error("CRITICAL ERROR: Your MongoDB Atlas Password for user 'pandikani636_db_user' is WRONG. You MUST go to MongoDB Atlas -> Database Access, and reset the password to a simple password without special characters.");
+        }
+        
         throw e;
     }
 
