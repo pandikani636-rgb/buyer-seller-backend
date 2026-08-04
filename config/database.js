@@ -8,7 +8,7 @@ const connectDatabase = () => {
         })
         .catch((err) => {
             console.error("MongoDB connection error:", err.message);
-            process.exit(1);
+            // Removed process.exit(1) so Vercel doesn't crash completely and strip CORS headers
         });
 }
 

@@ -17,6 +17,7 @@ const app = express();
 const allowedOrigins = [
     /^http:\/\/localhost:\d+$/,
     /^https:\/\/buyer-seller-frontend[\w-]*\.vercel\.app$/,
+    "https://buyer-seller-frontend-jtk3.vercel.app",
 ];
 
 app.use(cors({
@@ -46,7 +47,7 @@ app.use(cors({
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
 }));
 
 app.use(express.json({ limit: '50mb' }));
